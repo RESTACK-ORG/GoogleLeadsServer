@@ -7,12 +7,6 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 
-# Firebase Service Account Keys (CRITICAL - NEVER COMMIT THESE!)
-serviceAccountKey.json
-serviceAccountKey1.json
-serviceAccountKey2.json
-**/serviceAccountKey*.json
-firebase-adminsdk-*.json
 
 # Environment Variables
 .env
