@@ -168,7 +168,7 @@ export const addCampaginData = (afterCreate, unixTimestamp) => {
       ];
       userData.status = 'Customer';
   }
-
+  console.log(userData,"user data");
   return userData;
 }
 
