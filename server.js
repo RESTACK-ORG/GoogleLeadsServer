@@ -200,6 +200,16 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
 
         // Create a new campaign data object
         const newUserDataCampaign = {
+            phonenumber: phoneNumber,
+            name,
+            campaign,
+            projectId,
+            projectName,
+            utmDetails,
+            currentAgent,
+            added: unixDateTime,
+        };
+        const newUserDataCampaign1 = {
             phoneNumber,
             name,
             campaign,
@@ -212,7 +222,7 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
 
         // Save to Firebase 1 - googleLeadsStage1 collection
         console.log('📝 Saving to Firebase 1 - googleLeadsStage1');
-        await db1.collection("googleLeadsStage1").add(newUserDataCampaign);
+        await db1.collection("googleLeadsStage1").add(newUserDataCampaign1);
         console.log('✅ Successfully saved to googleLeadsStage1 in Firebase 1');
 
         // Add campaign meta data
