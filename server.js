@@ -221,7 +221,7 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
         };
 
         // Save to Firebase 1 - googleLeadsStage1 collection
-        console.log('📝 Saving to Firebase 1 - googleLeadsStage1');
+        console.log('📝 Saving to Firebase 1 - googleLeadsStage1',newUserDataCampaign1);
         await db1.collection("googleLeadsStage1").add(newUserDataCampaign1);
         console.log('✅ Successfully saved to googleLeadsStage1 in Firebase 1');
 
