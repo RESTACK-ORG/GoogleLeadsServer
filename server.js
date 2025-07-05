@@ -225,66 +225,71 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
         await db1.collection("googleLeadsStage1").add(newUserDataCampaign1);
         console.log('✅ Successfully saved to googleLeadsStage1 in Firebase 1');
 
-        // Add campaign meta data
-        const campaignDataWithMeta = addCampaginData(newUserDataCampaign, unixDateTime);
-
-        // Query Firebase 2 for existing user by phone number
-        console.log('🔍 Checking for existing user in Firebase 2');
-        const userSnapshot = await db2
-            .collection("new_users")
-            .where("phonenumber", "==", phoneNumber)
-            .get();
-
-        if (!userSnapshot.empty) {
-            console.log('👤 Updating existing user in Firebase 2');
-            const userDoc = userSnapshot.docs[0];
-            const userData = userDoc.data();
-
-            const history = userData.history || [];
-
-            // Prepare a new history entry with previous user data
-            const newHistoryEntry = {
-                projectId: userData.projectId || null,
-                taskHistory: userData.taskHistory || [],
-                notesHistory: userData.notesHistory || [],
-                property_requirement_formHistory: userData.property_requirement_form || [],
-                sharedPropertiesHistory: userData.sharedProperties || [],
-                agentChangeHistory: userData.agentChange || [],
-                timestamp: unixDateTime,
-            };
-
-            // Push new history entry only if the user has a projectId
-            if (userData.projectId) {
-                history.push(newHistoryEntry);
-            }
-
-            // Merge new campaign data and updated history into the existing document
-            await userDoc.ref.set(
-                {
-                    ...campaignDataWithMeta,
-                    history,
-                },
-                { merge: true }
-            );
-
-            console.log('✅ Successfully updated existing user in Firebase 2');
-            return res.status(200).json({
-                message: "Data successfully saved to both Firebase systems. Existing user updated with new campaign data and history.",
-                firebase1: "googleLeadsStage1 - New record created",
-                firebase2: "new_users - Existing record updated"
-            });
-        } else {
-            console.log('👤 Creating new user in Firebase 2');
-            // If no existing user, create a new document with the campaign data
-            await db2.collection("new_users").add(campaignDataWithMeta);
-            
-            console.log('✅ Successfully created new user in Firebase 2');
-            return res.status(201).json({
+         return res.status(201).json({
                 message: "Data successfully saved to both Firebase systems. New user created.",
-                firebase1: "googleLeadsStage1 - New record created",
-                firebase2: "new_users - New record created"
+                firebase: "googleLeadsStage1 - New record created",
             });
-        }
+
+        // Add campaign meta data
+        // const campaignDataWithMeta = addCampaginData(newUserDataCampaign, unixDateTime);
+
+        // // Query Firebase 2 for existing user by phone number
+        // console.log('🔍 Checking for existing user in Firebase 2');
+        // const userSnapshot = await db2
+        //     .collection("new_users")
+        //     .where("phonenumber", "==", phoneNumber)
+        //     .get();
+
+        // if (!userSnapshot.empty) {
+        //     console.log('👤 Updating existing user in Firebase 2');
+        //     const userDoc = userSnapshot.docs[0];
+        //     const userData = userDoc.data();
+
+        //     const history = userData.history || [];
+
+        //     // Prepare a new history entry with previous user data
+        //     const newHistoryEntry = {
+        //         projectId: userData.projectId || null,
+        //         taskHistory: userData.taskHistory || [],
+        //         notesHistory: userData.notesHistory || [],
+        //         property_requirement_formHistory: userData.property_requirement_form || [],
+        //         sharedPropertiesHistory: userData.sharedProperties || [],
+        //         agentChangeHistory: userData.agentChange || [],
+        //         timestamp: unixDateTime,
+        //     };
+
+        //     // Push new history entry only if the user has a projectId
+        //     if (userData.projectId) {
+        //         history.push(newHistoryEntry);
+        //     }
+
+        //     // Merge new campaign data and updated history into the existing document
+        //     await userDoc.ref.set(
+        //         {
+        //             ...campaignDataWithMeta,
+        //             history,
+        //         },
+        //         { merge: true }
+        //     );
+
+        //     console.log('✅ Successfully updated existing user in Firebase 2');
+        //     return res.status(200).json({
+        //         message: "Data successfully saved to both Firebase systems. Existing user updated with new campaign data and history.",
+        //         firebase1: "googleLeadsStage1 - New record created",
+        //         firebase2: "new_users - Existing record updated"
+        //     });
+        // } else {
+        //     console.log('👤 Creating new user in Firebase 2');
+        //     // If no existing user, create a new document with the campaign data
+        //     await db2.collection("new_users").add(campaignDataWithMeta);
+            
+        //     console.log('✅ Successfully created new user in Firebase 2');
+        //     return res.status(201).json({
+        //         message: "Data successfully saved to both Firebase systems. New user created.",
+        //         firebase1: "googleLeadsStage1 - New record created",
+        //         firebase2: "new_users - New record created"
+        //     });
+        // }
 
     } catch (error) {
         console.error("❌ Error processing the request:", error);
