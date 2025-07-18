@@ -13,7 +13,8 @@ const projectAgentEmail = {
   "sattva hamlet": "vishakha@canvas-homes.com",
   "tata carnatic": "ish.venaik@truestate.in",
   "brigade plot malur": "srihitha.reddy@truestate.in",
-  "sattva aeropolis": "piyush@canvas-homes.com"
+  "sattva aeropolis": "piyush@canvas-homes.com",
+  "brigade lakecrest": "srihitha.reddy@truestate.in",
 };
 
 const projectAgentId = {
@@ -28,7 +29,8 @@ const projectAgentId = {
   "sattva hamlet": "canv14",
   "tata carnatic": "canv04",
   "brigade plot malur": "canv03",
-  "sattva aeropolis": "canv05"
+  "sattva aeropolis": "canv05",
+  "brigade lakecrest": "canv03"
 };
 
 const projectAgentName = {
@@ -43,7 +45,8 @@ const projectAgentName = {
   "sattva hamlet": "Vishakha Sipani",
   "tata carnatic": "Ish Venaik",
   "brigade plot malur": "Srihitha",
-  "sattva aeropolis": "Piyush Lalwani"
+  "sattva aeropolis": "Piyush Lalwani",
+  "brigade lakecrest": "Srihitha"
 };
 
 const DEFAULT_EMAIL = "contact@canvas-homes.com";

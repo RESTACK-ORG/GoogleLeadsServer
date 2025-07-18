@@ -87,8 +87,9 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
         // Destructure required fields from the request body
         const { phoneNumber, name, campaign, projectId, projectName, utmDetails, currentAgent } = req.body;
 
+        console.log("Received data:", req.body);
         // Validate required fields
-        if (!phoneNumber || !name || campaign === undefined || !projectId || !projectName || !currentAgent) {
+        if (!phoneNumber || !name || campaign === undefined || !projectName) {
             return res.status(400).json({
                 error: 'Missing required fields: phoneNumber, name, campaign, projectId, projectName, and currentAgent.',
             });
