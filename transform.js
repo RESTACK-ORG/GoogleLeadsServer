@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 
 const projectAgentEmail = {
@@ -238,4 +238,4 @@ async function transformData(leads, db) {
 }
 
 
-module.exports = { transformData };
+export { transformData };
