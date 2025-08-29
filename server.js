@@ -1,14 +1,8 @@
 import express from 'express';
 import admin from 'firebase-admin';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
 import * as transform from './transform.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,56 +10,37 @@ const port = process.env.PORT || 3000;
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-// Initialize Firebase Admin SDK for two different systems
-let db1; // For googleLeadsStage1
+let db1;
 let firebase1Initialized = false;
 
 async function initializeFirebase1() {
   try {
-    // Check if service account file exists for Firebase 1
-    const serviceAccountPath1 = path.join(__dirname, 'serviceAccountKey.json');
-    
-    if (!fs.existsSync(serviceAccountPath1)) {
-      throw new Error('serviceAccountKey1.json file not found in the root directory');
+    if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+      throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY environment variable is required');
     }
 
-    // Read and validate service account
-    const serviceAccountData1 = fs.readFileSync(serviceAccountPath1, 'utf8');
-    const serviceAccount1 = JSON.parse(serviceAccountData1);
-    
-    // Validate required fields
+    const serviceAccount1 = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
     const requiredFields = ['private_key', 'client_email', 'project_id'];
     for (const field of requiredFields) {
       if (!serviceAccount1[field]) {
-        throw new Error(`Missing required field in serviceAccountKey1.json: ${field}`);
+        throw new Error(`Missing required field in service account: ${field}`);
       }
     }
 
-    // Initialize Firebase Admin App 1
     const app1 = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount1),
       projectId: serviceAccount1.project_id
-    }, 'firebase1'); // Named app instance
+    }, 'firebase1');
 
-    // Get Firestore instance for App 1
     db1 = admin.firestore(app1);
-    
-    // Test the connection
     await db1.collection('test').limit(1).get();
-    
     firebase1Initialized = true;
-    console.log('📁 Firebase 1 Project ID:', serviceAccount1.project_id);
     
   } catch (error) {
-   
-    console.error('3. The service account has proper permissions in the Firebase project.');
-    
+    console.error('Firebase initialization failed:', error.message);
     process.exit(1);
   }
 }
-
-
-// Middleware to check Firebase initialization
 const checkFirebaseInit = (req, res, next) => {
   if (!firebase1Initialized) {
     return res.status(500).json({
@@ -88,14 +63,11 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
         const { phoneNumber, name, campaign, projectId, projectName, utmDetails, currentAgent } = req.body;
 
         console.log("Received data:", req.body);
-        // Validate required fields
         if (!phoneNumber || !name || campaign === undefined || !projectName) {
             return res.status(400).json({
                 error: 'Missing required fields: phoneNumber, name, campaign, projectId, projectName, and currentAgent.',
             });
         }
-
-        // Additional validation
         if (typeof phoneNumber !== 'string' || typeof name !== 'string') {
             return res.status(400).json({
                 error: 'phoneNumber and name must be strings.',
@@ -123,31 +95,13 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
         details: error.message
       });
     }
-
-    // 3. Upload data
     for (const record of transformedLeads) {
       const { leadData, enquiryData, ...userData } = record;
 
-      console.log("lead data:", leadData);
-      console.log("Enquiry data:", enquiryData);
-      console.log("User data:", userData);
-
-      // Upload user
       await db1.collection('canvashomesUsers').doc(userData.userId).set(userData);
-      console.log(`✓ Uploaded user: ${userData.userId}`);
-
-      // Upload lead
       await db1.collection('canvashomesLeads').doc(leadData.leadId).set(leadData);
-      console.log(`✓ Uploaded lead: ${leadData.leadId}`);
-
-      // Upload enquiry
       await db1.collection('canvashomesEnquiries').doc(enquiryData.enquiryId).set(enquiryData);
-      console.log(`✓ Uploaded enquiry: ${enquiryData.enquiryId}`);
-
-      console.log(`--- Record processed successfully ---\n`);
     }
-
-    console.log("🎉 All records uploaded successfully.");
 
 
          return res.status(201).json({
@@ -155,15 +109,14 @@ app.post('/handleMultipleCampaignData', checkFirebaseInit, async (req, res) => {
           });
 
     } catch (error) {
-        console.error("❌ Error processing the request:", error);
+        console.error("Error processing request:", error);
         return res.status(500).json({ 
             error: error.message,
-            details: "Failed to save data to one or both Firebase systems"
+            details: "Failed to save data to Firebase"
         });
     }
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
     res.status(200).json({
       status: 'OK',
@@ -172,7 +125,6 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Root endpoint
 app.get('/', (req, res) => {
     res.json({
       message: 'Dual Firebase Express Server',
@@ -185,27 +137,14 @@ app.get('/', (req, res) => {
     });
 });
 
-// Initialize both Firebase instances before starting the server
 async function startServer() {
-    console.log('🚀 Initializing Firebase connections...');
-    
-    // Initialize both Firebase instances
-    await Promise.all([
-      initializeFirebase1()
-    ]);
-    
-    console.log('✅ Both Firebase instances initialized successfully');
+    await initializeFirebase1();
     
     app.listen(port, () => {
-        console.log(`🚀 Server is running on port ${port}`);
-        console.log(`📊 Health check: http://localhost:${port}/health`);
-        console.log(`🏠 Home: http://localhost:${port}/`);
-        console.log('🔥 Firebase 1: googleLeadsStage1 collection');
-        console.log('🔥 Firebase 2: new_users collection');
+        console.log(`Server running on port ${port}`);
     });
 }
 
-// Start the server
 startServer().catch(error => {
     console.error('Failed to start server:', error);
     process.exit(1);
