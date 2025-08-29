@@ -51,11 +51,11 @@ jobs:
         
     - name: Get deployment URL
       run: |
-        echo "Deployment URL: $(gcloud app browse --no-launch-browser)"
+        echo "Service deployed to: https://google-campaign-leads-service-dot-${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}.uc.r.appspot.com"
         
     - name: Health check
       run: |
         sleep 30
-        HEALTH_URL="$(gcloud app browse --no-launch-browser)/health"
+        HEALTH_URL="https://google-campaign-leads-service-dot-${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}.uc.r.appspot.com/health"
         echo "Checking health at: $HEALTH_URL"
         curl -f "$HEALTH_URL" || exit 1
