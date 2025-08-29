@@ -15,11 +15,18 @@ let firebase1Initialized = false;
 
 async function initializeFirebase1() {
   try {
-    if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
-      throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY environment variable is required');
+    // Read service account key from local file
+    const fs = await import('fs');
+    const path = await import('path');
+    
+    const serviceAccountPath = path.join(process.cwd(), 'serviceAccountKey.json');
+    
+    if (!fs.existsSync(serviceAccountPath)) {
+      throw new Error('serviceAccountKey.json file not found in project root');
     }
 
-    const serviceAccount1 = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+    const serviceAccountData = fs.readFileSync(serviceAccountPath, 'utf8');
+    const serviceAccount1 = JSON.parse(serviceAccountData);
     const requiredFields = ['private_key', 'client_email', 'project_id'];
     for (const field of requiredFields) {
       if (!serviceAccount1[field]) {
@@ -35,9 +42,15 @@ async function initializeFirebase1() {
     db1 = admin.firestore(app1);
     await db1.collection('test').limit(1).get();
     firebase1Initialized = true;
+    console.log('Firebase initialized successfully');
     
   } catch (error) {
-    console.error('Firebase initialization failed:', error.message);
+    console.error('Firebase initialization failed:', error);
+    console.error('Error details:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack
+    });
     process.exit(1);
   }
 }

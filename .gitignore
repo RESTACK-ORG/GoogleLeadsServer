@@ -14,9 +14,11 @@ yarn.lock
 .env.test.local
 .env.production.local
 .env.*
+serviceAccountKey
 
 # Firebase
 .firebase/
 .firebaserc
 firebase-debug.log
 firebase-debug.*.log
+serviceAccountKey.json
