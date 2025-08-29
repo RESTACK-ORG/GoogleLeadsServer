@@ -55,7 +55,20 @@ jobs:
         
     - name: Health check
       run: |
-        sleep 30
+        sleep 60
         HEALTH_URL="https://google-campaign-leads-service-dot-${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}.uc.r.appspot.com/health"
         echo "Checking health at: $HEALTH_URL"
-        curl -f "$HEALTH_URL" || exit 1
+        
+        # Retry health check up to 5 times
+        for i in {1..5}; do
+          echo "Health check attempt $i/5"
+          if curl -f "$HEALTH_URL"; then
+            echo "Health check passed!"
+            exit 0
+          fi
+          echo "Health check failed, waiting 30 seconds before retry..."
+          sleep 30
+        done
+        
+        echo "Health check failed after 5 attempts"
+        exit 1
