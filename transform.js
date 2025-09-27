@@ -136,8 +136,6 @@ async function transformData(leads, db) {
     // Fetch propertyId using propertyName
     const projectId = await getPropertyIdByName(projectName, db);
 
-    const timestamp = Math.floor(Date.now() / 1000);
-
     const userData = {
       userId: userId,
       phoneNumber: phone,
@@ -147,9 +145,6 @@ async function transformData(leads, db) {
       added: now,
       lastModified: now,
       label: "call",
-      phoneNumbers:[
-        { label: "primary", number: phone, addedAt: timestamp }
-      ]
     };
     userData.enquiryData = {
       enquiryId: enquiryId,
@@ -160,6 +155,7 @@ async function transformData(leads, db) {
       propertyId: projectId || null,
       rootPropertyName: null,
       rootPropertyId: null,
+      rootPropertySource:null,
       name: name.trim(),
       phoneNumber: phone || null,
       label: "call", 
