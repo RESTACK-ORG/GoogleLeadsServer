@@ -25,7 +25,7 @@ async function checkDuplicateLead(
 
 async function checkExistingUser(db, phoneNumber) {
   const userQuery = await db
-    .collection("canvashomesUsersTest")
+    .collection("canvashomesUsersV2")
     .where("phoneNumber", "==", phoneNumber)
     .limit(1)
     .get();
@@ -104,7 +104,7 @@ async function transformData(leads, db) {
 
     const isDuplicate = await checkDuplicateLead(
       db,
-      "canvashomesEnquiriesTest",
+      "canvashomesEnquiriesV2",
       phone,
       projectName
     );

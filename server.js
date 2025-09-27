@@ -136,14 +136,14 @@ app.post("/handleMultipleCampaignData", checkFirebaseInit, async (req, res) => {
       console.log("Already Exists Flag:", alreadyExists);
       if (!alreadyExists) {
       await db1
-        .collection("canvashomesUsersTest")
+        .collection("canvashomesUsersV2")
         .doc(userData.userId)
         .set(userData);
       }
 
 
       await db1
-        .collection("canvashomesEnquiriesTest")
+        .collection("canvashomesEnquiriesV2")
         .doc(enquiryData.enquiryId)
         .set(enquiryData);
     }
