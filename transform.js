@@ -162,6 +162,7 @@ async function transformData(leads, db) {
       source: platform,
       leadStatus: null,
       stage: null,
+      utmDetails: row.utmDetails,
       agentHistory: [
         {
           agentId: agentId,
